@@ -49,8 +49,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   energy: 90
-  attackPower: 10
+  attackPower: 1
   animalstate: 0
+  maxAttackPower: 0
   energyHungryThreshold: 50
   energyMateThreshold: 60
   speed: 4

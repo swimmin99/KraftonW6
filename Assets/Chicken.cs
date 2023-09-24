@@ -6,7 +6,8 @@ using Random = UnityEngine.Random;
 public class Chicken : Creature
 {
     public AnimalState animalstate;
-    [SerializeField] private float maxAttackPower;
+    public float maxAttackPower;
+
     [Header("Energy Threshold")] [SerializeField]
     private float energyHungryThreshold;
 
@@ -55,7 +56,7 @@ public class Chicken : Creature
     public bool isMoving = false;
     private AnimatorState triggerAnimation;
     private Quaternion targetRotation;
-
+    private int attackCount = 0;
     protected void Start()
     {
         PatrolTimer = Random.Range(PatrolMinTime, PatrolMaxTime);
@@ -121,7 +122,7 @@ public class Chicken : Creature
                 hungry();
                 break;
             case AnimalState.Mate:
-                if (!isPregnant)
+                if (!isPregnant && attackPower >= maxAttackPower)
                 {
                     findMate();
                 }
@@ -450,6 +451,9 @@ public class Chicken : Creature
             collidingObj.GetComponent<Creature>().energy -= attackPower;
             energy += attackPower;
             print("Attacked");
+            if (attackPower < maxAttackPower) {
+                attackPower += 1;
+            }
         }
     }
 

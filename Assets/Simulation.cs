@@ -28,10 +28,11 @@ public class Simulation : MonoBehaviour
         {
             GameObject raptor = Instantiate(Raptor, new Vector3(Random.Range(-50f, 50f), 1, Random.Range(-50f, 50f)), Quaternion.Euler(0, Random.Range(0f, 360f), 0), raptorTransform);
             raptor.GetComponent<Chicken>().speed = Random.Range(raptor_min_speed, raptor_max_speed);
-            raptor.GetComponent<Creature>().attackPower = Random.Range(raptor_min_attackPower, raptor_max_attackPower);
+            float maxAttackPower = Random.Range(raptor_min_attackPower, raptor_max_attackPower);
+            raptor.GetComponent<Chicken>().maxAttackPower = maxAttackPower;
+            raptor.GetComponent<Creature>().attackPower = maxAttackPower;
             raptor.GetComponent<Creature>().energy = 60f;
         }
-
         for (int i = 0; i < start_food; i++)
         {
             GameObject temp = Instantiate(Meat, new Vector3(Random.Range(-50f, 50f), 1, Random.Range(-50f, 50f)), Quaternion.Euler(0, Random.Range(0f, 360f), 0), foodTransform);
