@@ -19,8 +19,9 @@ public class NestController : MonoBehaviour
         for (int i = 0; i < babyCount; i++)
         {
             GameObject child = Instantiate(parents[0], transform.position, Quaternion.identity);
-            child.GetComponent<Creature>().attackPower = Random.Range(parents[0].GetComponent<Creature>().attackPower,
-                parents[1].GetComponent<Creature>().attackPower);
+            child.GetComponent<Chicken>().maxAttackPower = Random.Range(parents[0].GetComponent<Chicken>().maxAttackPower,
+                parents[1].GetComponent<Chicken>().maxAttackPower);
+            child.GetComponent<Creature>().attackPower = 1;
         }
         Destroy(gameObject);
     }

@@ -8,7 +8,6 @@ public class CameraController : MonoBehaviour
      * of the float inputs in the editor 
      * just delete [SerializeField] 
      * from the beginning of each float line */
-
     public Transform cameraTransform;
 
     [SerializeField] private float _camSpeed = 1f; //Speed of the camera

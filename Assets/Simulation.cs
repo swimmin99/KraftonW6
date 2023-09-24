@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 public class Simulation : MonoBehaviour
 {
-    
+
     public int start_raptor;
     public int start_food;
 
@@ -15,7 +15,7 @@ public class Simulation : MonoBehaviour
     public float raptor_max_attackPower;
     public GameObject Raptor;
     public GameObject Meat;
-   // private float time;
+    // private float time;
 
     public Transform raptorTransform;
     public Transform foodTransform;
@@ -35,7 +35,7 @@ public class Simulation : MonoBehaviour
         }
         for (int i = 0; i < start_food; i++)
         {
-            GameObject temp = Instantiate(Meat, new Vector3(Random.Range(-50f, 50f), 1, Random.Range(-50f, 50f)), Quaternion.Euler(0, Random.Range(0f, 360f), 0), foodTransform);
+            GameObject temp = Instantiate(Meat, new Vector3(Random.Range(-150f, 150f), 1, Random.Range(-150f, 150f)), Quaternion.Euler(0, Random.Range(0f, 360f), 0), foodTransform);
             temp.GetComponent<Creature>().energy = 1;
         }
     }
@@ -44,7 +44,9 @@ public class Simulation : MonoBehaviour
     {
         GameObject[] raptorObjects = GameObject.FindGameObjectsWithTag("Raptor");
         statusUI.text = "Raptor Count: " + raptorObjects.Length;
-
+        if (Random.Range(0f, 1f) < food_spawn_rate)
+        {
+            Instantiate(Meat, new Vector3(Random.Range(-150f, 150f), 1f, Random.Range(-150f, 150f)), Quaternion.Euler(0, Random.Range(0f, 360f), 0), foodTransform);
+        }
     }
-
 }

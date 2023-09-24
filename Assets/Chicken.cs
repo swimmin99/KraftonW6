@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 using Random = UnityEngine.Random;
 
 public class Chicken : Creature
 {
     public AnimalState animalstate;
     public float maxAttackPower;
-
     [Header("Energy Threshold")] [SerializeField]
     private float energyHungryThreshold;
 
@@ -57,12 +57,13 @@ public class Chicken : Creature
     private AnimatorState triggerAnimation;
     private Quaternion targetRotation;
     private int attackCount = 0;
+    private Notice notice;
 
     public string getStateInfo()
     {
         return
             "Name   " + gameObject.name +
-            "\nState    " + animalstate.ToString() +
+            "\n\nState    " + animalstate.ToString() +
             "\nEnergy   " + energy.ToString() + "%" +
             "\nGrowth   " + ((int)(attackPower / maxAttackPower * 100)).ToString() + "%" +
             "\nisPregnant   " + isPregnant;
@@ -75,6 +76,7 @@ public class Chicken : Creature
         PersuitTimer = Random.Range(PersuitMinTime, PersuitMaxTime);
         restTimer = Random.Range(restMinTime, restMaxTime);
         triggerAnimation = GetComponent<AnimatorState>();
+        notice = GameObject.FindGameObjectWithTag("NoticeUI").GetComponent<Notice>();
     }
 
     protected override void Update()
@@ -106,7 +108,7 @@ public class Chicken : Creature
         //CheckEnergy
         if (energy <= 0)
         {
-            Destroy(gameObject);
+            StartCoroutine(IE_Dying(1.5f));
         }
         //CheckImmediateDanger
         if (isUnderAttack)
@@ -216,7 +218,7 @@ public class Chicken : Creature
             GameObject myTarget = FindBestTarget(targets, target => isPrey(target.transform.gameObject));
             if (myTarget != null)
             {
-                print("persuit : " + myTarget);
+                sendNotice(gameObject.name + " started chashing after " + myTarget.name);
                 persuit(myTarget);
             }
             else
@@ -444,6 +446,7 @@ public class Chicken : Creature
             }
             if (!chicken.isPregnant)
             {
+                sendNotice(gameObject.name + " is now pregnant.");
                 isPregnant = true;
                 StartCoroutine(IE_pregnancy(collidingObj));
             }
@@ -465,6 +468,7 @@ public class Chicken : Creature
     {
         if (isPrey(collidingObj))
         {
+            sendNotice(gameObject.name + " is eating " + collidingObj.name);
             collidingObj.GetComponent<Creature>().energy -= attackPower;
             energy += attackPower;
             print("Attacked");
@@ -478,6 +482,7 @@ public class Chicken : Creature
     {
         if (isPredator(collidingObj))
         {
+            sendNotice(gameObject.name + " has attacked " + collidingObj.name);
             collidingObj.GetComponent<Creature>().getHurt(attackPower);
         }
     }
@@ -488,6 +493,15 @@ public class Chicken : Creature
         yield return new WaitForSeconds(seconds);
         stopMoving = false;
     }
+
+    IEnumerator IE_Dying(float seconds)
+    {
+        stopMoving = true;
+        triggerAnimation.PlayDying();
+        yield return new WaitForSeconds(seconds);
+        Destroy(gameObject);
+    }
+
 
     public override void getHurt(float damage)
     {
@@ -511,5 +525,11 @@ public class Chicken : Creature
                 Gizmos.DrawSphere(hit.point, 0.5f);
             }
         }
+    }
+
+    public void sendNotice(string noticeString)
+    {
+        notice.textUGUI.text = noticeString;
+        notice.targetPosition = transform.position;
     }
 }

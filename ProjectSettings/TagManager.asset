@@ -9,6 +9,7 @@ TagManager:
   - Fox
   - Raptor
   - StatusUI
+  - NoticeUI
   layers:
   - Default
   - TransparentFX
