@@ -54,13 +54,7 @@ MonoBehaviour:
   energyHungryThreshold: 50
   energyMateThreshold: 60
   speed: 4
-  visionRadius: 50
-  visionDistance: 0
   runAwayDistance: 15
-  allyPowerThreshold: 1
-  allyCountThreshold: 10
-  enemiesCountThreshold: 11
-  reproductionCount: 3
   PatrolMinTime: 3
   PatrolMaxTime: 10
   PersuitMinTime: 3
@@ -71,11 +65,17 @@ MonoBehaviour:
   restMaxTime: 3
   rotationSpeed: 2
   energyDepletion: 0.1
+  visionRadius: 50
+  visionDistance: 0
   animalLayer:
     serializedVersion: 2
     m_Bits: 8
-  isMoving: 0
+  allyPowerThreshold: 1
+  allyCountThreshold: 10
+  enemiesCountThreshold: 11
   NestPrefab: {fileID: 2797807165805369070, guid: 18a66adf3da3f8a4ca47751a4a7e5c75, type: 3}
+  pregnancyPeriod: 5
+  isMoving: 0
 --- !u!114 &8646211286279784760
 MonoBehaviour:
   m_ObjectHideFlags: 0

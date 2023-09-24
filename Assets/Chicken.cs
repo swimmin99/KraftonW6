@@ -5,18 +5,17 @@ using Random = UnityEngine.Random;
 
 public class Chicken : Creature
 {
-    
     public AnimalState animalstate;
-    [SerializeField] private float energyHungryThreshold;
+
+    [Header("Energy Threshold")] [SerializeField]
+    private float energyHungryThreshold;
+
     [SerializeField] private float energyMateThreshold;
-    [SerializeField]public float speed;
-    [SerializeField]public float visionRadius;
-    [SerializeField]public float visionDistance;
-    [SerializeField]private float runAwayDistance;
-    [SerializeField]private float allyPowerThreshold;
-    [SerializeField]private int allyCountThreshold;
-    [SerializeField]private int enemiesCountThreshold;
-    [SerializeField] private int reproductionCount;
+
+    [Header("Move Related Properties")] [SerializeField]
+    public float speed;
+
+    [SerializeField] private float runAwayDistance;
     [SerializeField] private float PatrolMinTime;
     [SerializeField] private float PatrolMaxTime;
     [SerializeField] private float PersuitMinTime;
@@ -27,10 +26,24 @@ public class Chicken : Creature
     [SerializeField] private float restMaxTime;
     [SerializeField] private float rotationSpeed = 2.0f;
     [SerializeField] private float energyDepletion;
+
+    [Header("Detection Related Properties")] [SerializeField]
+    public float visionRadius;
+
+    [SerializeField] public float visionDistance;
     [SerializeField] private LayerMask animalLayer;
-    [SerializeField] private GameObject NestPrefab;
+
+    [Header("Ally Related Properties")] [SerializeField]
+    private float allyPowerThreshold;
+
+    [SerializeField] private int allyCountThreshold;
+    [SerializeField] private int enemiesCountThreshold;
+
+    [Header("Pregnancy Related Properties")] [SerializeField]
+    private GameObject NestPrefab;
+
     [SerializeField] private float pregnancyPeriod;
-    
+
     private bool isPregnant = false;
     private float PatrolTimer = 0f;
     private float PersuitTimer = 0f;
@@ -39,14 +52,9 @@ public class Chicken : Creature
     private bool isUnderAttack = false;
     private bool stopMoving = false;
     private GameObject attackTarget;
-
     public bool isMoving = false;
     private AnimatorState triggerAnimation;
-    private Quaternion targetRotation; // Add this variable to store the target rotation
-
-
-    // Adjust the rotation speed as needed
-
+    private Quaternion targetRotation;
 
     protected void Start()
     {
@@ -64,20 +72,29 @@ public class Chicken : Creature
     }
 
 
-
     private void checkConditions()
     {
-        animalstate = energy >= energyMateThreshold ? AnimalState.Mate : energy <= energyHungryThreshold ? AnimalState.Hungry : AnimalState.Neutral;
+        animalstate = energy >= energyMateThreshold ? AnimalState.Mate :
+            energy <= energyHungryThreshold ? AnimalState.Hungry : AnimalState.Neutral;
     }
-    
+
 
     private void updateActions()
     {
+        if (!checkDanger())
+        {
+            checkStates();
+
+        }
+    }
+    protected bool checkDanger()
+    {
+        //CheckEnergy
         if (energy <= 0)
         {
             Destroy(gameObject);
         }
-
+        //CheckImmediateDanger
         if (isUnderAttack)
         {
             if (!checkEnemies())
@@ -88,66 +105,52 @@ public class Chicken : Creature
                 }
             }
         }
-        
-        if (!checkPredators())
+        return checkPredators();
+    }
+    protected void checkStates()
+    {
+        switch (animalstate)
         {
-            switch (animalstate)
-            {
-                case AnimalState.Neutral:
-                    patrol(false, false);
-                    break;
-                case AnimalState.Hungry:
-                    hungry();
-                    break;
-                case AnimalState.Mate:
-                    if (!isPregnant)
-                    {
-                        mate();
-                    }
-                    break;
-            }
+            case AnimalState.Neutral:
+                patrol(false, false);
+                break;
+            case AnimalState.Hungry:
+                hungry();
+                break;
+            case AnimalState.Mate:
+                if (!isPregnant)
+                {
+                    findMate();
+                }
+                break;
         }
     }
-
-    private void OnDrawGizmos()
+    private RaycastHit[] hitRaycasts()
     {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, visionRadius);
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, visionRadius, transform.forward, visionDistance,
+            animalLayer);
 
-        RaycastHit[] hits = findTarget();
-        if (hits != null)
-        {
-            foreach (RaycastHit hit in hits)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(hit.point, 0.5f);
-                Gizmos.DrawSphere(hit.point, 0.5f);
-            }
-        }
-    }
-    private RaycastHit[] findTarget()
-    {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, visionRadius, transform.forward, visionDistance, animalLayer);
-        
         return hits;
     }
     private GameObject FindBestTarget(RaycastHit[] targets, Func<RaycastHit, bool> condition)
     {
         GameObject myTarget = null;
+        float closestDistance = float.MaxValue; // Initialize to a large value.
+
         foreach (RaycastHit target in targets)
         {
-            if (condition(target))
+            if (condition(target) && target.collider.gameObject != gameObject)
             {
-                if (myTarget == null)
+                float distanceToTarget = Vector3.Distance(transform.position, target.collider.gameObject.transform.position);
+
+                if (myTarget == null || distanceToTarget < closestDistance)
                 {
                     myTarget = target.collider.gameObject;
-                }
-                else if (myTarget.GetComponent<Creature>().attackPower > target.collider.gameObject.GetComponent<Creature>().attackPower)
-                { 
-                    myTarget = target.collider.gameObject;
+                    closestDistance = distanceToTarget;
                 }
             }
         }
+
         return myTarget;
     }
 
@@ -162,7 +165,6 @@ public class Chicken : Creature
             }
         }
         return false;
-        
     }
 
     public bool isMate(GameObject target)
@@ -170,7 +172,8 @@ public class Chicken : Creature
         if (target != null)
         {
             Creature creature;
-            if (target.TryGetComponent(out creature)){
+            if (target.TryGetComponent(out creature))
+            {
                 return creature.attackPower > this.attackPower / 2;
             }
         }
@@ -189,10 +192,10 @@ public class Chicken : Creature
         }
         return false;
     }
-    
+
     private void hungry()
     {
-        RaycastHit[] targets = findTarget();
+        RaycastHit[] targets = hitRaycasts();
         if (targets != null)
         {
             GameObject myTarget = FindBestTarget(targets, target => isPrey(target.transform.gameObject));
@@ -208,9 +211,9 @@ public class Chicken : Creature
         }
     }
 
-    private void mate()
+    private void findMate()
     {
-        RaycastHit[] targets = findTarget();
+        RaycastHit[] targets = hitRaycasts();
         if (targets != null)
         {
             GameObject myTarget = FindBestTarget(targets, target => isMate(target.transform.gameObject));
@@ -226,16 +229,18 @@ public class Chicken : Creature
     }
     private bool checkPredators()
     {
-        RaycastHit[] targets = findTarget();
+        RaycastHit[] targets = hitRaycasts();
         if (targets == null || targets.Length == 0)
         {
             return false;
         }
+
         GameObject myTarget = FindBestTarget(targets, target => isPredator(target.transform.gameObject));
         if (myTarget == null)
         {
             return false;
         }
+
         if (!checkAllies() || energy < energyHungryThreshold / 2)
         {
             animalstate = AnimalState.Run;
@@ -246,12 +251,13 @@ public class Chicken : Creature
             persuit(myTarget);
             animalstate = AnimalState.Attack;
         }
+
         return true;
     }
 
     private bool checkAllies()
     {
-        RaycastHit [] targets = findTarget();
+        RaycastHit[] targets = hitRaycasts();
         int allyCount = 0;
         foreach (RaycastHit target in targets)
         {
@@ -267,27 +273,30 @@ public class Chicken : Creature
         {
             return true;
         }
+
         return false;
     }
-    
+
     private bool checkEnemies()
     {
-        RaycastHit [] targets = findTarget();
+        RaycastHit[] targets = hitRaycasts();
         int enemiesCount = 0;
         foreach (RaycastHit target in targets)
         {
             Creature creature;
             target.collider.gameObject.TryGetComponent(out creature);
             float targetPower = creature.attackPower;
-            if (targetPower < attackPower/2)
+            if (targetPower < attackPower / 2)
             {
                 enemiesCount++;
             }
         }
+
         if (enemiesCount >= enemiesCountThreshold)
         {
             return true;
         }
+
         return false;
     }
 
@@ -304,12 +313,12 @@ public class Chicken : Creature
             energy -= Time.deltaTime * energyDepletion * speed;
         }
     }
+
     private void patrol(bool hasTarget, bool findSmaller)
-    { 
+    {
         Vector3 move = Vector3.zero;
         if (PatrolTimer <= 0)
         {
-            // Generate a random Y rotation
             float randomYRotation = Random.Range(-90f, 90f);
             targetRotation = Quaternion.Euler(0, randomYRotation, 0);
 
@@ -330,17 +339,14 @@ public class Chicken : Creature
                 isMoving = true;
                 PatrolTimer -= Time.deltaTime;
                 energy -= Time.deltaTime * energyDepletion * speed;
-
-                // Smoothly rotate towards the targetRotation
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-
-                // Move forward
+                transform.rotation =
+                    Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
                 transform.position += transform.forward * Time.deltaTime * speed;
                 print("patrolling");
             }
         }
     }
-    
+
     private void persuit(GameObject target)
     {
         if (PersuitTimer <= 0)
@@ -353,7 +359,6 @@ public class Chicken : Creature
                 restTimer = Random.Range(restMinTime, restMaxTime);
             }
         }
-
         if (!stopMoving)
         {
             isMoving = true;
@@ -369,9 +374,10 @@ public class Chicken : Creature
         switch (animalstate)
         {
             case AnimalState.Neutral:
+                fighting(other.gameObject);
                 break;
             case AnimalState.Hungry:
-                if(triggerAnimation!=null)
+                if (triggerAnimation != null)
                     triggerAnimation.PlayEating();
                 eating(other.gameObject);
                 print("playAnimation");
@@ -379,20 +385,20 @@ public class Chicken : Creature
 
                 break;
             case AnimalState.Mate:
-                if(triggerAnimation!=null)
+                if (triggerAnimation != null)
                     triggerAnimation.PlayMating();
                 mating(other.gameObject);
                 StartCoroutine(IE_stopMoving(3));
 
                 break;
             case AnimalState.Attack:
-                if(triggerAnimation!=null)
+                if (triggerAnimation != null)
                     triggerAnimation.PlayBiting();
                 attacking(other.gameObject);
                 StartCoroutine(IE_stopMoving(3));
 
                 break;
-        }   
+        }
     }
 
     private void fighting(GameObject collidingObj)
@@ -411,23 +417,24 @@ public class Chicken : Creature
         {
             Chicken chicken;
             collidingObj.TryGetComponent(out chicken);
-            if (chicken != null)
+            if (chicken == null)
             {
-                if (!chicken.isPregnant)
-                {
-                    isPregnant = true;
-                    StartCoroutine(IE_pregnancy(collidingObj));
-                }
-                energy = energyHungryThreshold;
-                print("Mate");
+                return;
             }
+            if (!chicken.isPregnant)
+            {
+                isPregnant = true;
+                StartCoroutine(IE_pregnancy(collidingObj));
+            }
+            energy = energyHungryThreshold;
+            print("Mate");
         }
     }
 
     IEnumerator IE_pregnancy(GameObject collidingObj)
     {
         yield return new WaitForSeconds(pregnancyPeriod);
-        GameObject nest =Instantiate(NestPrefab);
+        GameObject nest = Instantiate(NestPrefab);
         nest.GetComponent<NestController>().parents[0] = gameObject;
         nest.GetComponent<NestController>().parents[1] = collidingObj;
         isPregnant = false;
@@ -457,11 +464,28 @@ public class Chicken : Creature
         yield return new WaitForSeconds(seconds);
         stopMoving = false;
     }
-    
+
     public override void getHurt(float damage)
     {
         StartCoroutine(IE_stopMoving(3));
         energy -= damage;
     }
-   
+    
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, visionRadius);
+
+        RaycastHit[] hits = hitRaycasts();
+        if (hits != null)
+        {
+            foreach (RaycastHit hit in hits)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(hit.point, 0.5f);
+                Gizmos.DrawSphere(hit.point, 0.5f);
+            }
+        }
+    }
 }
