@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4314377142162810184}
   - component: {fileID: 9192780009195166290}
   - component: {fileID: 4936899257691163082}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Nest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ GameObject:
   - component: {fileID: 6590106814772194760}
   - component: {fileID: 5690075591321657826}
   - component: {fileID: 2292741617841628208}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Nest_04_LOD2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -204,7 +204,7 @@ GameObject:
   - component: {fileID: 7983414550054361388}
   - component: {fileID: 3501258152885141196}
   - component: {fileID: 3881235840949554459}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Nest_04_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,7 +288,7 @@ GameObject:
   - component: {fileID: 6434321730826761802}
   - component: {fileID: 7699436157316272438}
   - component: {fileID: 6496205661597110802}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Nest_04_LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}

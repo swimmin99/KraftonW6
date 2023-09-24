@@ -57,6 +57,17 @@ public class Chicken : Creature
     private AnimatorState triggerAnimation;
     private Quaternion targetRotation;
     private int attackCount = 0;
+
+    public string getStateInfo()
+    {
+        return
+            "Name   " + gameObject.name +
+            "\nState    " + animalstate.ToString() +
+            "\nEnergy   " + energy.ToString() + "%" +
+            "\nGrowth   " + ((int)(attackPower / maxAttackPower * 100)).ToString() + "%" +
+            "\nisPregnant   " + isPregnant;
+    }
+
     protected void Start()
     {
         PatrolTimer = Random.Range(PatrolMinTime, PatrolMaxTime);
@@ -310,10 +321,17 @@ public class Chicken : Creature
         {
             isMoving = true;
             Vector3 direction = transform.position - target.transform.position;
+            direction.y = 0f; 
             direction.Normalize();
+
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            targetRotation.x = 0f;
+            targetRotation.z = 0f; 
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+
             Vector3 targetPosition = transform.position + direction * runAwayDistance;
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * speed);
-            transform.LookAt(transform.position + direction);
             energy -= Time.deltaTime * energyDepletion * speed;
         }
     }
@@ -333,8 +351,6 @@ public class Chicken : Creature
                 PatrolTimer = Random.Range(PatrolMinTime, PatrolMaxTime);
                 IdleTimer = Random.Range(IdleMinTime, IdleMaxTime);
             }
-
-            print("patrolDirectionPick");
         }
         else
         {
@@ -343,10 +359,11 @@ public class Chicken : Creature
                 isMoving = true;
                 PatrolTimer -= Time.deltaTime;
                 energy -= Time.deltaTime * energyDepletion * speed;
-                transform.rotation =
-                    Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+                Quaternion currentRotation = transform.rotation;
+                targetRotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
+                transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotationSpeed * Time.deltaTime);
                 transform.position += transform.forward * Time.deltaTime * speed;
-                print("patrolling");
             }
         }
     }

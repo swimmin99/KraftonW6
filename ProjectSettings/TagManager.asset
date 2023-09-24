@@ -7,6 +7,8 @@ TagManager:
   - Grass
   - Rabbit
   - Fox
+  - Raptor
+  - StatusUI
   layers:
   - Default
   - TransparentFX
@@ -14,7 +16,7 @@ TagManager:
   - Animal
   - Water
   - UI
-  - 
+  - Ground
   - 
   - 
   - 

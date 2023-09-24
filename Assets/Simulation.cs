@@ -20,7 +20,7 @@ public class Simulation : MonoBehaviour
     public Transform raptorTransform;
     public Transform foodTransform;
 
-    //public TextMeshProUGUI statusUI;
+    public TextMeshProUGUI statusUI;
 
     void Start()
     {
@@ -42,10 +42,9 @@ public class Simulation : MonoBehaviour
 
     void Update()
     {
-        if (Random.Range(0f, 1f) < food_spawn_rate)
-        {
-            Instantiate(Meat, new Vector3(Random.Range(-50f, 50f), 1f, Random.Range(-50f, 50f)), Quaternion.Euler(0, Random.Range(0f, 360f), 0), foodTransform);
-        }
+        GameObject[] raptorObjects = GameObject.FindGameObjectsWithTag("Raptor");
+        statusUI.text = "Raptor Count: " + raptorObjects.Length;
+
     }
-    
+
 }

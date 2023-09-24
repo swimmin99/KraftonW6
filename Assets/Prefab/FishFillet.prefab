@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 533041204167774982}
   - component: {fileID: 6257569214257756241}
   - component: {fileID: 5001493911626422353}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 3379762835815670593}
   - component: {fileID: 5098074539940300847}
   - component: {fileID: 6323494879768508360}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: FishFillet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -156,7 +156,7 @@ GameObject:
   - component: {fileID: 7480329434783960942}
   - component: {fileID: 7758068573755338807}
   - component: {fileID: 2792559717546618643}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
