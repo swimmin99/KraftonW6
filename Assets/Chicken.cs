@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 public class Chicken : Creature
 {
     public AnimalState animalstate;
-
+    [SerializeField] private float maxAttackPower;
     [Header("Energy Threshold")] [SerializeField]
     private float energyHungryThreshold;
 
@@ -43,7 +43,7 @@ public class Chicken : Creature
     private GameObject NestPrefab;
 
     [SerializeField] private float pregnancyPeriod;
-
+    private bool isAdult = false;
     private bool isPregnant = false;
     private float PatrolTimer = 0f;
     private float PersuitTimer = 0f;
@@ -67,6 +67,8 @@ public class Chicken : Creature
 
     protected override void Update()
     {
+        float mySize = 0.5f + attackPower / 100f;
+        transform.localScale = new Vector3(mySize,mySize,mySize);
         checkConditions();
         updateActions();
     }
@@ -97,12 +99,13 @@ public class Chicken : Creature
         //CheckImmediateDanger
         if (isUnderAttack)
         {
-            if (!checkEnemies())
+            return false;
+        }
+        if (!checkEnemies())
+        {
+            while (attackTarget != null)
             {
-                while (attackTarget != null)
-                {
-                    persuit(attackTarget);
-                }
+                persuit(attackTarget);
             }
         }
         return checkPredators();
